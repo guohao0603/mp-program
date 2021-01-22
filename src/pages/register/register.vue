@@ -8,31 +8,51 @@
 </template>
 
 <script>
+import {wxJscode} from '../../utils/authorize.js'
+import Storage, {STORAGE_KEY} from '../../utils/storage.js'
+import {reLaunch} from '../../utils/index.js'
 export default {
   name: 'register',
   data () {
     return {
-      common: {}
+      common: {},
+      openId: '',
+      sessionKey: ''
     }
   },
   components: {},
   methods: {
     async getPhoneNumber (info) { // 小程序个人开发者 无法获取手机号等用户隐私
+      let sessionKey = this.sessionKey
       let detail = info.mp.detail
       let errMsg = detail.errMsg
+      let params = { appId: 'wx220584793284e9d6', encryptedData: detail.encryptedData, iv: detail.iv, sessionKey }
+      await this.$http.post('/api/decrypt', params).then((res) => {
+        // console.log('解密data', res)
+        Storage.setStorageData(STORAGE_KEY.USER_ID, res.data.phoneNumber)
+        reLaunch('personal')
+      })
       if (errMsg.split(':')[1] !== 'ok') {
         // errorModal('请重试')
         return null
       }
+    },
+    async getSessionkey (code) {
+      let wxUrl = `https://api.weixin.qq.com/sns/jscode2session?appid=wx220584793284e9d6&secret=f734b676524698f8da6eb613a9bee08c&js_code=${code}&grant_type=authorization_code`
+      await this.$http.get(wxUrl).then((res) => {
+        let result = res.data
+        this.openId = result.openid
+        this.sessionKey = result.session_key
+      })
     }
   },
   computed () {
 
   },
-  async mounted () {
-
-  },
-  onShow () {
+  async mounted () {},
+  async onShow () {
+    let jscode = await wxJscode()
+    this.getSessionkey(jscode)
     this.common = this.getCommonLanguageConfig()
   },
   onShareAppMessage: function () {

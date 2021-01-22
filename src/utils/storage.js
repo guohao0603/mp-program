@@ -9,7 +9,7 @@ class Storage {
     wx.setStorageSync(key, data)
   }
   static getStorageData (key) {
-    wx.getStorageSync(key)
+    return wx.getStorageSync(key)
   }
   static removeStorageData (key) {
     wx.removeStorageSync(key)

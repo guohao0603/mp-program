@@ -1,4 +1,5 @@
 //引入
+const WXBizDataCrypt = require('./WXBizDataCrypt') // 解密手机号
 const express=require("express");
 const path = require('path');
 const Mock = require('mockjs');
@@ -178,6 +179,14 @@ app.post("/api/login",(req,res)=>{
     }
 })
 
+app.post("/api/decrypt",(req,res)=>{
+    console.log(JSON.stringify(req.body))
+    // console.log(req.body)
+    const {appId,encryptedData,iv,sessionKey} = req.body
+    let pc = new WXBizDataCrypt(appId, sessionKey)
+    let data = pc.decryptData(encryptedData , iv)
+    res.send(data)
+})
 //设置监听的端口 和 域名  RESTFUL API 风格
 //get 查询 获取post 提交 插入 put 更新 delete 删除
 var server = app.listen(5001,function(){

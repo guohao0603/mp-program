@@ -23,6 +23,11 @@ function wxLogin () {
     errorModal(errMsg)
   })
 }
+
+export async function wxJscode () {
+  let code = await wxLogin()
+  return code
+}
 export async function wxGetUserInfo () {
   let code = await wxLogin()
   // 先掉一遍缓存

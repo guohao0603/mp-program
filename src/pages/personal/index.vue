@@ -4,7 +4,7 @@
       <span class="my-img">
         <img src="../../../static/images/user.png">
       </span>
-      <span class="my-name">Ocean</span>
+      <span class="my-name">{{userPhone}}</span>
     </div>
     <div class="my-list">
       <mineItem :title="i18n.assess" icon="/static/images/pingjia.png" :action="myDing"
@@ -25,8 +25,8 @@
 import mineItem from '../../components/mineItem'
 import Storage, {STORAGE_KEY} from '../../utils/storage'
 import event from '../../utils/event'
-// import {errorModal, reLaunch} from '../../utils/index'
-// import {checkLogin} from '../../utils/authorize'
+import {reLaunch, errorModal} from '../../utils/index'
+import {checkLogin} from '../../utils/authorize'
 export default {
   name: 'mine',
   data () {
@@ -35,7 +35,8 @@ export default {
       common: {},
       languages: ['简体中文', 'English'],
       languageIndex: wx.i18n.getLanguageCode() === 'en' ? 1 : 0,
-      isLogin: true
+      isLogin: true,
+      userPhone: null
     }
   },
   components: { mineItem },
@@ -65,17 +66,16 @@ export default {
   onShow () {
     this.common = this.getCommonLanguageConfig()
     this.checkLanguage()
+    this.userPhone = Storage.getStorageData(STORAGE_KEY.USER_ID)
   },
   onTabItemTap () {
-    // checkLogin().then(() => {}, () => {
-    //   this.isLogin = false
-    //   errorModal(this.common.loginError, () => { // 确定回调
-    //     reLaunch('register')
-    //     // navigateTo('register')
-    //   }, () => { // 取消回调
-    //     reLaunch('register')
-    //   })
-    // })
+    checkLogin().then(async () => { // 已登录
+      console.log('已登录')
+    }, () => { // 未登录
+      errorModal(this.common.loginError, () => {
+        reLaunch('register')
+      })
+    })
   },
   computed: {}
 }

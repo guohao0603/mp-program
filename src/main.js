@@ -10,7 +10,7 @@ fly.interceptors.request.use((config, promise) => {
   config.headers['X-Tag'] = 'flyio'
   return config
 })
-fly.config.baseURL = 'http://192.168.0.105:5001'
+fly.config.baseURL = 'http://192.168.0.103:5001'
 
 Vue.prototype.$http = fly
 
